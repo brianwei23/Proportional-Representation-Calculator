@@ -28,7 +28,7 @@
             text-align: left;
         }
 
-        .numSeatQuery {
+        .numPartyQuery {
             margin-top: 130px;
             align-items: center;
             justify-content: center;
@@ -46,6 +46,45 @@
             font-size: 1em;
             width: 200px;
         }
+
+        .numPartyBtn {
+            margin-top: 7px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #4d9d8a;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        th, td {
+            text-align: center;
+            padding: 10px;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: separate;
+        }
+
+        .calcBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #4d9d8a;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
 <body>
@@ -53,9 +92,49 @@
         <div class ="frontHeader">Proportional Representation Calculator</div>
         <div class ="description">This calculator uses the Sainte-Laguë method to convert the number of votes for each political party into seats in a legislative election. Sainte-Laguë method is a proportional representation method.</div>
     </div>
-    <div class="numSeatQuery">
-        <label for="numSeatInput">Number of seats:</label>
-        <input type="text" id="numSeatInput" name="numSeat">
+    <div class="numPartyQuery" id="numPartyQuery">
+        <label for="numPartyInput">Number of parties:</label>
+        <input type="text" id="numPartyInput" name="numParty">
+        <button class="numPartyBtn" onclick="showPartyVotesForm()">Enter</button>
     </div>
+
+    <div class="container hidden" id="partyVotesForm">
+        <h1>Please enter the name of the parties and the number of votes each party received. When entering a number, remove any commas or decimals.</h1>
+        <form id="partyVoteForm">
+            <table id="partyVoteTable">
+                <tr>
+                    <th>Party</th>
+                    <th>Votes</th>
+                </tr>
+            </table>
+            <button type="submit" class="calcBtn">Calculate</button>
+        </form>
+    </div>
+
+    <script>
+        function isInt(num){
+            const numInt = Number(num);
+            return Number.isInteger(numInt) && num.trim() !== '';
+        }
+
+        function showPartyVotesForm() {
+            const numParty = document.getElementById('numPartyInput').value;
+            if(numParty && isInt(numParty) && numParty > 0){
+                document.getElementById('numPartyQuery').classList.add('hidden');
+                document.getElementById('partyVotesForm').classList.remove('hidden');
+                const table = document.getElementById('partyVoteTable');
+                for(let i = 0; i < parseInt(numParty); i++){
+                    const row = table.insertRow(-1);
+                    const partyCell = row.insertCell(0);
+                    const numVotesCell = row.insertCell(1);
+                    partyCell.innerHTML = `<input type="text" name="partyList[]" required>`;
+                    numVotesCell.innerHTML = `<input type="number" name=numVotes[]" required>`;
+                }
+            }
+            else {
+                alert("Error: Enter a valid number of parties.");
+            }
+        }
+    </script>
 </body>
 </html>
