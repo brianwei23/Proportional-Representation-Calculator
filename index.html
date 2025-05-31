@@ -85,6 +85,24 @@
             margin-left: auto;
             margin-right: auto;
         }
+
+        .seatQuery {
+            margin-top: 70px;
+            margin-bottom: 50px;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            gap: 10px;
+        }
+
+        .threshQuery {
+            margin-top: 1px;
+            margin-bottom: 50px;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            gap: 10px;           
+        }
     </style>
 </head>
 <body>
@@ -100,6 +118,14 @@
 
     <div class="container hidden" id="partyVotesForm">
         <h1>Please enter the name of the parties and the number of votes each party received. When entering a number, remove any commas or decimals.</h1>
+        <div class="seatQuery" id="seatQuery">
+            <label for="numSeatInput">Number of seats:</label>
+            <input type="number" id="numSeatInput" name="numSeat">
+        </div>
+        <div class="threshQuery" id="threshQuery">
+            <label for="threshInput">Electoral threshold (%):</label>
+            <input type="number" id="threshInput" name="thresh">
+        </div>
         <form id="partyVoteForm">
             <table id="partyVoteTable">
                 <tr>
@@ -109,6 +135,16 @@
             </table>
             <button type="submit" class="calcBtn">Calculate</button>
         </form>
+    </div>
+
+    <div class="container hidden" id="resultTableSection">
+        <h1>Result</h1>
+        <table id="resultTable">
+            <tr>
+                <th>Party</th>
+                <th>Number of seats</th>
+            </tr>
+        </table>
     </div>
 
     <script>
@@ -128,13 +164,32 @@
                     const partyCell = row.insertCell(0);
                     const numVotesCell = row.insertCell(1);
                     partyCell.innerHTML = `<input type="text" name="partyList[]" required>`;
-                    numVotesCell.innerHTML = `<input type="number" name=numVotes[]" required>`;
+                    numVotesCell.innerHTML = `<input type="number" name="numVotes[]" required>`;
                 }
             }
             else {
                 alert("Error: Enter a valid number of parties.");
             }
         }
+
+        function calcSeats(event) {
+            event.preventDefault();
+            const resultsSection = document.getElementById('resultTableSection');
+            const resultsTable = document.getElementById('resultsTable');
+            const numParty = parseInt(document.getElementById('numPartyInput').value);
+
+            while(resultsTable.rows.length > 1){
+                resultsTable.deleteRow(1);
+            }
+
+            for(let i = 0; i < numParty; i++){
+                const row = resultsTable.insertRow(-1);
+                row.insertCell(0).innerText = "";
+                row.insertCell(1).innerText = "";
+            }
+            resultsSection.classList.remove('hidden');
+        }
+        document.getElementById("partyVoteForm").addEventListener("submit", calcSeats);
     </script>
 </body>
 </html>
