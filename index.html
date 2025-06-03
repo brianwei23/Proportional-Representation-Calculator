@@ -120,7 +120,7 @@
         <h1>Please enter the name of the parties and the number of votes each party received. When entering a number, remove any commas or decimals.</h1>
         <div class="seatQuery" id="seatQuery">
             <label for="numSeatInput">Number of seats:</label>
-            <input type="number" id="numSeatInput" name="numSeat">
+            <input type="number" id="numSeatInput" name="numSeat" step="1" min="1" required>
         </div>
         <div class="threshQuery" id="threshQuery">
             <label for="threshInput">Electoral threshold (%):</label>
@@ -153,6 +153,7 @@
             return Number.isInteger(numInt) && num.trim() !== '';
         }
 
+        let formListener = false;
         function showPartyVotesForm() {
             const numParty = document.getElementById('numPartyInput').value;
             if(numParty && isInt(numParty) && numParty > 0){
@@ -166,6 +167,10 @@
                     partyCell.innerHTML = `<input type="text" name="partyList[]" required>`;
                     numVotesCell.innerHTML = `<input type="number" name="numVotes[]" required>`;
                 }
+                if(!formListener){
+                    document.getElementById("partyVoteForm").addEventListener("submit", calcSeats);
+                    formListener = true;
+                }
             }
             else {
                 alert("Error: Enter a valid number of parties.");
@@ -175,21 +180,61 @@
         function calcSeats(event) {
             event.preventDefault();
             const resultsSection = document.getElementById('resultTableSection');
-            const resultsTable = document.getElementById('resultsTable');
-            const numParty = parseInt(document.getElementById('numPartyInput').value);
+            const resultsTable = document.getElementById('resultTable');
+            const partyNames = document.getElementsByName("partyList[]")
+            const votes = document.getElementsByName("numVotes[]")
+            const legisSeats = Number(document.getElementById("numSeatInput").value);
+            const threshold = parseFloat(document.getElementById("threshInput").value) || 0;
+
+            if(!Number.isInteger(legisSeats) || legisSeats <= 0){
+                alert("Enter in a valid number of total seats.");
+            }
+
+            if(threshold < 0){
+                alert("Threshold must be at least 0%.");
+            }
+
+            const partyObj = [];
+            let allVotes = 0;
+
+            for(let i = 0; i < partyNames.length; i++){
+                const name = partyNames[i].value.trim();
+                const numOfVotes = parseInt(votes[i].value);
+                if(name && !isNaN(numOfVotes) && numOfVotes >= 0){
+                    partyObj.push({name: name, votes: numOfVotes, seats:0});
+                    allVotes += numOfVotes;
+                }
+            }
+
+            const seatParties = partyObj.filter(p => (p.votes / allVotes) * 100 >= threshold);
+
+            for(let i = 0; i < legisSeats; i++){
+                let maxValue = -1;
+                let victorIndex = -1;
+
+                for(let j = 0; j < seatParties.length; j++){
+                    const {votes, seats} = seatParties[j];
+                    const value = votes / (2 * seats + 1);
+
+                    if(value > maxValue){
+                        maxValue = value;
+                        victorIndex = j;
+                    }
+                }
+                seatParties[victorIndex].seats += 1;
+            }
 
             while(resultsTable.rows.length > 1){
                 resultsTable.deleteRow(1);
             }
 
-            for(let i = 0; i < numParty; i++){
+            seatParties.forEach(p => {
                 const row = resultsTable.insertRow(-1);
-                row.insertCell(0).innerText = "";
-                row.insertCell(1).innerText = "";
-            }
+                row.insertCell(0).innerText = p.name;
+                row.insertCell(1).innerText = p.seats;
+            });
             resultsSection.classList.remove('hidden');
         }
-        document.getElementById("partyVoteForm").addEventListener("submit", calcSeats);
     </script>
 </body>
 </html>
