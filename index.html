@@ -84,6 +84,7 @@
             display: block;
             margin-left: auto;
             margin-right: auto;
+            margin-bottom: 50px;
         }
 
         .seatQuery {
@@ -102,6 +103,19 @@
             justify-content: center;
             display: flex;
             gap: 10px;           
+        }
+
+        #resultTable {
+            width: 50%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        #resultTable th, #resultTable td {
+            border: 1px solid #000;
+            color: black;
+            padding: 10px;
         }
     </style>
 </head>
@@ -138,11 +152,13 @@
     </div>
 
     <div class="container hidden" id="resultTableSection">
-        <h1>Result</h1>
+        <h1 style="text-align: center;">Result</h1>
         <table id="resultTable">
             <tr>
                 <th>Party</th>
                 <th>Number of seats</th>
+                <th>Percentage of seats</th>
+                <th>Percentage of votes</th>
             </tr>
         </table>
     </div>
@@ -174,6 +190,7 @@
             }
             else {
                 alert("Error: Enter a valid number of parties.");
+                return;
             }
         }
 
@@ -188,22 +205,35 @@
 
             if(!Number.isInteger(legisSeats) || legisSeats <= 0){
                 alert("Enter in a valid number of total seats.");
+                return;
             }
 
             if(threshold < 0){
                 alert("Threshold must be at least 0%.");
+                return;
             }
 
             const partyObj = [];
             let allVotes = 0;
 
+            const nameList = new Set();
+
             for(let i = 0; i < partyNames.length; i++){
                 const name = partyNames[i].value.trim();
                 const numOfVotes = parseInt(votes[i].value);
-                if(name && !isNaN(numOfVotes) && numOfVotes >= 0){
-                    partyObj.push({name: name, votes: numOfVotes, seats:0});
-                    allVotes += numOfVotes;
+
+                if(nameList.has(name)){
+                    alert(`Duplicate party name detected: "${name}".`);
+                    return;
                 }
+
+                if(isNaN(numOfVotes) || numOfVotes < 0){
+                    alert(`Vote count for party "${name}" is invalid, or it is missing.`);
+                    return;
+                }
+                nameList.add(name);
+                partyObj.push({name: name, votes: numOfVotes, seats: 0});
+                allVotes += numOfVotes;
             }
 
             const seatParties = partyObj.filter(p => (p.votes / allVotes) * 100 >= threshold);
@@ -228,10 +258,15 @@
                 resultsTable.deleteRow(1);
             }
 
-            seatParties.forEach(p => {
+            partyObj.forEach(p => {
                 const row = resultsTable.insertRow(-1);
                 row.insertCell(0).innerText = p.name;
-                row.insertCell(1).innerText = p.seats;
+                const seatCount = seatParties.find(sp => sp.name === p.name)?.seats || 0;
+                row.insertCell(1).innerText = seatCount;
+                const seatPercent = (seatCount / legisSeats) * 100;
+                const votePercent = (p.votes / allVotes) * 100;
+                row.insertCell(2).innerText = seatPercent.toFixed(2) + '%';
+                row.insertCell(3).innerText = votePercent.toFixed(2) + '%';
             });
             resultsSection.classList.remove('hidden');
         }
