@@ -72,7 +72,7 @@
             border-collapse: separate;
         }
 
-        .calcBtn {
+        .calcBtn, .goBackBtn, .addRowBtn, .delRowBtn {
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 1em;
@@ -81,10 +81,6 @@
             border: none;
             cursor: pointer;
             border-radius: 10px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            margin-bottom: 50px;
         }
 
         .seatQuery {
@@ -122,6 +118,22 @@
             line-height: 2;
             margin-bottom: 1em;
         }
+
+        #goBackAndCalc{
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            justify-content: center;
+            margin-bottom: 50px;
+        }
+
+        #delAddRows {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -152,7 +164,14 @@
                     <th>Votes</th>
                 </tr>
             </table>
-            <button type="submit" class="calcBtn">Calculate</button>
+            <div id="delAddRows">
+                <button type="button" class="delRowBtn">Delete Last Row</button>
+                <button type="button" class="addRowBtn">Add Row</button>
+            </div>
+            <div id="goBackAndCalc">
+                <button class="goBackBtn" onclick="location.reload();">Go Back</button>
+                <button type="submit" class="calcBtn">Calculate</button>
+            </div>
         </form>
     </div>
 
@@ -265,6 +284,13 @@
             }
 
             partyObj.forEach(p => {
+                const match = seatParties.find(sp => sp.name === p.name);
+                p.seats = match ? match.seats : 0;
+            });
+
+            partyObj.sort((a, b) => b.seats - a.seats);
+           
+            partyObj.forEach(p => {
                 const row = resultsTable.insertRow(-1);
                 row.insertCell(0).innerText = p.name;
                 const seatCount = seatParties.find(sp => sp.name === p.name)?.seats || 0;
@@ -273,6 +299,12 @@
                 const votePercent = (p.votes / allVotes) * 100;
                 row.insertCell(2).innerText = seatPercent.toFixed(2) + '%';
                 row.insertCell(3).innerText = votePercent.toFixed(2) + '%';
+
+                if(p.seats > legisSeats / 2){
+                    for(let i = 0; i < 4; i++){
+                        row.cells[i].style.fontWeight = 'bold';
+                    }
+                }
             });
 
             const failedParties = partyObj.filter(p => (p.votes / allVotes) * 100 < threshold).map(p => p.name);
@@ -294,6 +326,29 @@
             `;
             resultsSection.classList.remove('hidden');
         }
+
+        document.querySelector(".addRowBtn").addEventListener("click", (e) => {
+            e.preventDefault();
+            const table = document.getElementById("partyVoteTable");
+            const row = table.insertRow(-1);
+            const partyCell = row.insertCell(0);
+            const votesCell = row.insertCell(1);
+
+            partyCell.innerHTML = `<input type="text" name="partyList[]">`;
+            votesCell.innerHTML = `<input type="number" name="numVotes[]">`;
+        });
+
+        document.querySelector(".delRowBtn").addEventListener("click", (e) => {
+            e.preventDefault();
+            const table = document.getElementById("partyVoteTable");
+            if(table.rows.length > 2) {
+                table.deleteRow(-1);
+            }
+            else{
+                alert("You must have at least one row.");
+                return;
+            }
+        });
     </script>
 </body>
 </html>
