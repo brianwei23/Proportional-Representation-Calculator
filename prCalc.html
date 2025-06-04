@@ -265,7 +265,7 @@
 
             for(let i = 0; i < legisSeats; i++){
                 let maxValue = -1;
-                let victorIndex = -1;
+                let contenders = [];
 
                 for(let j = 0; j < seatParties.length; j++){
                     const {votes, seats} = seatParties[j];
@@ -273,10 +273,35 @@
 
                     if(value > maxValue){
                         maxValue = value;
-                        victorIndex = j;
+                        contenders = [j];
+                    }
+                    else if(value === maxValue){
+                        contenders.push(j);
                     }
                 }
-                seatParties[victorIndex].seats += 1;
+                let victorIndex = contenders[0];
+
+                if(contenders.length > 1){
+                    let topVotes = seatParties[contenders[0]].votes;
+                    let tied = [contenders[0]];
+
+                    for(let k = 1; k < contenders.length; k++){
+                        const idx = contenders[k];
+                        const v = seatParties[idx].votes;
+
+                        if(v > topVotes){
+                            topVotes = v;
+                            tied = [idx];
+                        }
+                        else if(v === topVotes){
+                            tied.push(idx);
+                        }
+                    }
+                    victorIndex = tied.length === 1
+                        ? tied[0]
+                        : tied[Math.floor(Math.random() * tied.length)];
+                }
+                seatParties[victorIndex].seats += 1
             }
 
             while(resultsTable.rows.length > 1){
