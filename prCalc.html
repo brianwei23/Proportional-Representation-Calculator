@@ -225,9 +225,10 @@
             const resultsTable = document.getElementById('resultTable');
             const partyNames = document.getElementsByName("partyList[]")
             const votes = document.getElementsByName("numVotes[]")
-            const legisSeats = Number(document.getElementById("numSeatInput").value);
-            const threshold = parseFloat(document.getElementById("threshInput").value) || 0;
+            const legisSeats = Number(document.getElementById("numSeatInput").value); // Total number of seats up for election.
+            const threshold = parseFloat(document.getElementById("threshInput").value) || 0; // Parties need to get at least the threshold to win seats.
 
+            // legisSeats must be greater than 0. It must be an integer (no decimals).
             if(!Number.isInteger(legisSeats) || legisSeats <= 0){
                 alert("Enter in a valid number of total seats.");
                 return;
@@ -239,7 +240,7 @@
             }
 
             const partyObj = [];
-            let allVotes = 0;
+            let allVotes = 0; // Total votes in the election across all parties.
 
             const nameList = new Set();
 
@@ -261,7 +262,7 @@
                 allVotes += numOfVotes;
             }
 
-            const seatParties = partyObj.filter(p => (p.votes / allVotes) * 100 >= threshold);
+            const seatParties = partyObj.filter(p => (p.votes / allVotes) * 100 >= threshold); // Filter by only including the parties that have obtained the threshold.
 
             for(let i = 0; i < legisSeats; i++){
                 let maxValue = -1;
@@ -269,14 +270,15 @@
 
                 for(let j = 0; j < seatParties.length; j++){
                     const {votes, seats} = seatParties[j];
-                    const value = votes / (2 * seats + 1);
+                    const value = votes / (2 * seats + 1);  // Formula used in Sainte-Lague
 
+                    // We want to focus on the party with the highest quotient (value)
                     if(value > maxValue){
                         maxValue = value;
                         contenders = [j];
                     }
                     else if(value === maxValue){
-                        contenders.push(j);
+                        contenders.push(j); // If tied for the max, expect to see more than one party in contenders.
                     }
                 }
                 let victorIndex = contenders[0];
@@ -288,15 +290,18 @@
                     for(let k = 1; k < contenders.length; k++){
                         const idx = contenders[k];
                         const v = seatParties[idx].votes;
-
+                        
+                        // Focus on the one with more votes
                         if(v > topVotes){
                             topVotes = v;
                             tied = [idx];
                         }
                         else if(v === topVotes){
-                            tied.push(idx);
+                            tied.push(idx); // If tied for the max, expect to see more than one party in tied list
                         }
                     }
+
+                    // If there is only one item in tied, then that index is the victorIndex. If there's more than one item in tied, use a random process for tiebreaker.
                     victorIndex = tied.length === 1
                         ? tied[0]
                         : tied[Math.floor(Math.random() * tied.length)];
@@ -308,17 +313,18 @@
                 resultsTable.deleteRow(1);
             }
 
+            // Match party in partyObj to seatParties and copy the number of seats from seatParties to partyObj. If no match, 0 seats are assigned.
             partyObj.forEach(p => {
                 const match = seatParties.find(sp => sp.name === p.name);
                 p.seats = match ? match.seats : 0;
             });
 
-            partyObj.sort((a, b) => b.seats - a.seats);
+            partyObj.sort((a, b) => b.seats - a.seats); // Table starts with party with most seats
            
             partyObj.forEach(p => {
                 const row = resultsTable.insertRow(-1);
                 row.insertCell(0).innerText = p.name;
-                const seatCount = seatParties.find(sp => sp.name === p.name)?.seats || 0;
+                const seatCount = seatParties.find(sp => sp.name === p.name)?.seats || 0; // Number of seats won by the party.
                 row.insertCell(1).innerText = seatCount;
                 const seatPercent = (seatCount / legisSeats) * 100;
                 const votePercent = (p.votes / allVotes) * 100;
@@ -327,7 +333,7 @@
 
                 if(p.seats > legisSeats / 2){
                     for(let i = 0; i < 4; i++){
-                        row.cells[i].style.fontWeight = 'bold';
+                        row.cells[i].style.fontWeight = 'bold'; // Bold the parties that won a majority of seats
                     }
                 }
             });
@@ -370,7 +376,7 @@
                 table.deleteRow(-1);
             }
             else{
-                alert("You must have at least one row.");
+                alert("You must have at least one row."); // Prevent the case of having no rows.
                 return;
             }
         });
