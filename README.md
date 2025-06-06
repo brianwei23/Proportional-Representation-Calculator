@@ -7,7 +7,9 @@ The Sainte-Laguë method is used in countries such as Germany, New Zealand, and 
 ## Tibreaker Logic
 The calculator features a tiebreaker algorithm. Whenever there are more than one party with the same maximum quotient, the number of votes received is reviewed, and the tied party with more votes is the winner for that round. If the number of votes is tied between the parties, then the victorious party is chosen randomly.
 
-## Features
+## How to use
+Download prCalc.html in the Github repository and open it in VS Code. Then, under "View" at the top menu, click on "Extensions". Then look for a Live Server and install it. Then, right click on prCalc.html on the left-hand menu and click on "Open with Live Server" or "Open with Five Server" depending on what extension you installed. This will bring you to the page in a browser.
+
 The first page you encounter asks you for the number of parties that are participating in the election. Your answer must be an integer greater than 0. Your answer will result in the number of rows for the form.
 
 After you submit that, you will encounter a page asking for:
@@ -21,7 +23,7 @@ Below that, there are four buttons:
   - Add Row: adds a row to the bottom of the "party and votes" form.
   - Calculate: calculates the number of seats for each party and displays the results in a table. Summary results are also displayed.
 
-After you press the calculate button, the results will appear at the bottom. You will the summary results which showcases:
+After you press the calculate button, the results will appear at the bottom. You will see the summary results which showcases:
   -  The total number of votes cast in the election.
   -  The total number of seats up for election.
   -  The electoral threshold.
