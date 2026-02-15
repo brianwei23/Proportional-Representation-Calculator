@@ -1,5 +1,5 @@
 # Proportional-Representation-Calculator
-This calculator uses the Sainte-Laguë method to convert the number of votes for each political party into seats in a legislative election. Sainte-Laguë method is a proportional representation method.
+This is a personal project, and the calculator uses the Sainte-Laguë method to convert the number of votes for each political party into seats in a legislative election. Sainte-Laguë method is a proportional representation method.
 
 ## Sainte-Laguë method
 The Sainte-Laguë method is used in countries such as Germany, New Zealand, and Sweden. There are many variations of the method's formulas, but the default formula used for the method is "v / (2s + 1)" where "v" is the total number of votes the party earned, and "s" is the number of seats already allocated to that party. This is the formula used in this calculator's algorithm. The party with the highest quotient in the round gets one seat for that round.
